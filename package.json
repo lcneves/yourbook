@@ -1,0 +1,19 @@
+{
+  "name": "yourbook",
+  "version": "1.0.0",
+  "description": "Book club exercise for freeCodeCamp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lcneves/yourbook.git"
+  },
+  "author": "Lucas Neves",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lcneves/yourbook/issues"
+  },
+  "homepage": "https://github.com/lcneves/yourbook#readme"
+}
