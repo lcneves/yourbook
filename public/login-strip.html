@@ -11,9 +11,6 @@
         overflow: hidden;
         transition: height 0.7s;
     }
-    #settings-container {
-        max-width: 65em;
-    }
     .form-div {
         display: none;
         text-align: center;
@@ -106,44 +103,44 @@
                         <div id="settings-div" class="form-div">
                             <form id="settings-form" class="form-horizontal" name="settings-form" ng-controller="SettingsController" ng-submit="update(new)">
                                 <div class="form-group">
-                                    <label for="settings-password" class="col-sm-2 control-label">New password:</label>
-                                    <div class="col-sm-10">
+                                    <label for="settings-password" class="col-sm-5 control-label">New password:</label>
+                                    <div class="col-sm-7">
                                         <input id="settings-password" class="form-control text-input" type="password" name="password" ng-model="new.newPassword" placeholder="Unchanged"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="settings-password-repeat" class="col-sm-2 control-label">Repeat password:</label>
-                                    <div class="col-sm-10">
+                                    <label for="settings-password-repeat" class="col-sm-5 control-label">Repeat password:</label>
+                                    <div class="col-sm-7">
                                         <input id="register-password-repeat" class="form-control text-input" type="password" name="password-repeat" ng-model="new.passwordRepeat" placeholder="Unchanged"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="settings-realname" class="col-sm-2 control-label">Real name:</label>
-                                    <div class="col-sm-10">
+                                    <label for="settings-realname" class="col-sm-5 control-label">Real name:</label>
+                                    <div class="col-sm-7">
                                         <input id="settings-realname" class="form-control text-input" type="text" name="realname" ng-model="new.realname"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="settings-country" class="col-sm-2 control-label">Country:</label>
-                                    <div class="col-sm-10">
+                                    <label for="settings-country" class="col-sm-5 control-label">Country:</label>
+                                    <div class="col-sm-7">
                                         <input id="settings-country" class="form-control text-input" type="text" name="country" ng-model="new.country"></input>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="settings-state" class="col-sm-2 control-label">State:</label>
-                                    <div class="col-sm-10">
+                                    <label for="settings-state" class="col-sm-5 control-label">State:</label>
+                                    <div class="col-sm-7">
                                         <input id="settings-state" class="form-control text-input" type="text" name="state" ng-model="new.state"></input>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="settings-city" class="col-sm-2 control-label">City:</label>
-                                    <div class="col-sm-10">
+                                    <label for="settings-city" class="col-sm-5 control-label">City:</label>
+                                    <div class="col-sm-7">
                                         <input id="settings-city" class="form-control text-input" type="text" name="city" ng-model="new.city" placeholder="City"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="settings-old-password" class="col-sm-2 control-label">Old password:</label>
-                                    <div class="col-sm-10">
+                                    <label for="settings-old-password" class="col-sm-5 control-label">Old password:</label>
+                                    <div class="col-sm-7">
                                         <input id="settings-old-password" class="form-control text-input" type="password" name="old-password" ng-model="new.oldPassword" required/>
                                     </div>
                                 </div>
@@ -163,7 +160,7 @@
     // Required by countries.js
     populateCountries("country", "state");
 
-    // Animate the "login" and "register" sections
+    // Animate the "login", "register" and "settings" sections
     (function($) {
         $("#login-link").click(function() {
             if($("#login-div").css('display') == 'none') {
