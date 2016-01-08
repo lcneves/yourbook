@@ -2,7 +2,7 @@
     #login-status {
         text-align: center;
     }
-    #form-container {
+    .form-container {
         position: relative;
         height: 0;
         max-width: 30em;
@@ -10,6 +10,9 @@
         padding: 0;
         overflow: hidden;
         transition: height 0.7s;
+    }
+    #settings-container {
+        max-width: 65em;
     }
     .form-div {
         display: none;
@@ -24,6 +27,9 @@
     .logout-icon {
         margin-left: 0.5em;
     }
+    .login-strip-link {
+        color: #c1d7e9 !important;
+    }
 </style>
 <div id="login-body" ng-app="loginModule">
     <div id="login-status" ng-controller="StatusController">
@@ -31,11 +37,11 @@
             <h4>Loading, please wait...</h4>
         </div>
         <div id="login-not-logged" ng-show="receivedLogin && !isLogged">
-            <div class="panel panel-success">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h4>Not logged in. Please <a id="login-link" class="text-danger" href="#">login</a> or <a id="register-link" class="text-danger" href="#">register</a>.</h4>
+                    <h4>Not logged in. Please <a id="login-link" class="login-strip-link" href="#">login</a> or <a id="register-link" class="login-strip-link" href="#">register</a>.</h4>
                 </div>
-                    <div id="form-container" class="panel-body">
+                    <div id="form-container" class="panel-body form-container">
                         <div id="register-div" class="form-div">
                             <form id="register-form" name="register-form" ng-controller="RegisterController" ng-submit="register()">
                                 <div class="form-group">
@@ -53,6 +59,18 @@
                                 <div class="form-group">
                                     <label class="sr-only" for="register-realname">Real name:</label>
                                     <input id="register-realname" class="form-control text-input" type="text" name="realname" ng-model="user.realname" placeholder="Real name"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="country">Country:</label>
+                                    <select id="country" class="form-control" name="country" ng-model="user.country" placeholder="Country"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="state">State:</label>
+                                    <select name="state" id="state" class="form-control" ng-model="user.state" placeholder="State"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="register-city">Real name:</label>
+                                    <input id="register-city" class="form-control text-input" type="text" name="city" ng-model="user.city" placeholder="City"/>
                                 </div>
                                 <button type="submit" class="btn btn-default">Register <i class="fa fa-cog" ng-show="!isLoading"></i><i class="fa fa-cog fa-spin" ng-show="isLoading"></i></button>
                                 <div>
@@ -80,19 +98,73 @@
                 </div>
             </div>
             <div id="login-logged" ng-show="isLogged">
-                <div class="panel panel-success">
+                <div class="panel panel-primary">
                     <div class="panel-heading" ng-controller="LogoutController">
-                        <h4>Welcome, {{user}}! <a class="text-danger logout-icon" href="#" ng-click="logout()" ng-show="!isLoading"><i class="fa fa-sign-out"></i></a><i class="fa fa-cog fa-spin logout-icon" ng-show="isLoading"></i></h4>
+                        <h4>Welcome, {{user.realname}}! <a id="settings-link" class="logout-icon login-strip-link" href="#"><i class="fa fa-wrench"></i></a> <a class="logout-icon login-strip-link" href="#" ng-click="logout()" ng-show="!isLoading"><i class="fa fa-sign-out"></i></a><i class="fa fa-cog fa-spin logout-icon" ng-show="isLoading"></i></h4>
+                    </div>
+                    <div id="settings-container" class="panel-body form-container">
+                        <div id="settings-div" class="form-div">
+                            <form id="settings-form" class="form-horizontal" name="settings-form" ng-controller="SettingsController" ng-submit="update(new)">
+                                <div class="form-group">
+                                    <label for="settings-password" class="col-sm-2 control-label">New password:</label>
+                                    <div class="col-sm-10">
+                                        <input id="settings-password" class="form-control text-input" type="password" name="password" ng-model="new.newPassword" placeholder="Unchanged"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="settings-password-repeat" class="col-sm-2 control-label">Repeat password:</label>
+                                    <div class="col-sm-10">
+                                        <input id="register-password-repeat" class="form-control text-input" type="password" name="password-repeat" ng-model="new.passwordRepeat" placeholder="Unchanged"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="settings-realname" class="col-sm-2 control-label">Real name:</label>
+                                    <div class="col-sm-10">
+                                        <input id="settings-realname" class="form-control text-input" type="text" name="realname" ng-model="new.realname"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="settings-country" class="col-sm-2 control-label">Country:</label>
+                                    <div class="col-sm-10">
+                                        <input id="settings-country" class="form-control text-input" type="text" name="country" ng-model="new.country"></input>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="settings-state" class="col-sm-2 control-label">State:</label>
+                                    <div class="col-sm-10">
+                                        <input id="settings-state" class="form-control text-input" type="text" name="state" ng-model="new.state"></input>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="settings-city" class="col-sm-2 control-label">City:</label>
+                                    <div class="col-sm-10">
+                                        <input id="settings-city" class="form-control text-input" type="text" name="city" ng-model="new.city" placeholder="City"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="settings-old-password" class="col-sm-2 control-label">Old password:</label>
+                                    <div class="col-sm-10">
+                                        <input id="settings-old-password" class="form-control text-input" type="password" name="old-password" ng-model="new.oldPassword" required/>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-default">Update <i class="fa fa-cog" ng-show="!isLoading"></i><i class="fa fa-cog fa-spin" ng-show="isLoading"></i></button>
+                                <div>
+                                    <p class="error-message text-danger">{{message}}</p>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     </div>
 </div>
 <script>
+    // Required by countries.js
+    populateCountries("country", "state");
+
+    // Animate the "login" and "register" sections
     (function($) {
-//        $("#login-div").css('display', 'block').addClass("animated slideInDown");
         $("#login-link").click(function() {
             if($("#login-div").css('display') == 'none') {
                 $("#form-container").css("height", "12em");
@@ -105,12 +177,28 @@
         });
         $("#register-link").click(function() {
             if($("#register-div").css('display') == 'none') {
-                $("#form-container").css("height", "19em");
+                $("#form-container").css("height", "29em");
                 $("#login-div").removeClass("animated slideInDown").addClass("animated fadeOutDown");
                 window.setTimeout(function() {
                     $("#login-div").removeClass("animated fadeOutDown").css('display', 'none');
                     $("#register-div").css('display', 'block').addClass("animated slideInDown");
                 }, 700);
+            }
+        });
+        $("#settings-link").click(function() {
+            if($("#settings-div").css('display') == 'none') {
+                $("#settings-container").css("height", "29em");
+                window.setTimeout(function() {
+                    $("#settings-div").css('display', 'block').addClass("animated slideInDown");
+                }, 700);
+            } else {
+                $("#settings-div").removeClass("animated slideInDown").addClass("animated fadeOutDown");
+                window.setTimeout(function() {
+                    $("#settings-container").css("height", "0");
+                }, 700);
+                window.setTimeout(function() {
+                    $("#settings-div").css("display", "none");
+                }, 1400);
             }
         });
     }(jQuery));

@@ -1,6 +1,8 @@
+'use strict';
+
 var SESSION_KEY,
     BCRIPT_COST = 8,
-    dbConfig = require('./db-config.js'),
+    dbConfig = require('./mongo-helper.js'),
     objectID=require('mongodb').ObjectID,
     bcrypt = require('bcrypt'),
     passport = require('passport'),
@@ -60,10 +62,14 @@ module.exports.init = function(key) {
         collection.findOne({_id: objectID(id)}, function(err, user) {
             if (err) { throw err; }
             if (user) {
+                // This is the info that will be available to the client. Use wisely!
                 var userInfo = {
                     _id: user._id,
                     username: user.username,
-                    realname: user.realname
+                    realname: user.realname,
+                    country: user.country,
+                    state: user.state,
+                    city: user.city
                 }
                 done(err, userInfo);
             }
@@ -71,12 +77,18 @@ module.exports.init = function(key) {
     });
 
     // Routing begins here
-
     router.post('/register', function (req, res) {
-        var user = req.body.username;
-        var pass = req.body.password;
-        var passRepeat = req.body.passwordRepeat;
-        var name = req.body.realname;
+        var user = req.body.username,
+            pass = req.body.password,
+            passRepeat = req.body.passwordRepeat;
+            
+        // Edit the following vars to match your HTML form values
+        var name = req.body.realname,
+            country = req.body.country,
+            state = req.body.state,
+            city = req.body.city;
+
+        // Some server-side error checking
         if (user == "") {
             res.send("Username cannot be empty");
             return;
@@ -97,6 +109,8 @@ module.exports.init = function(key) {
             res.send("Passwords do not match");
             return;
         }
+        
+        // Errors checked, let's begin the database work by checking if user exists
         var collection = dbConfig.db.collection('users');
         collection.findOne(
             {username: user},
@@ -105,11 +119,14 @@ module.exports.init = function(key) {
                 if (document) {
                     res.send("User " + user + " already exists");
                 } else {
+                    // User does not exist. Let's create a hash for the provided password!
                     bcrypt.hash(pass, BCRIPT_COST, function(err, hash) {
                         if (err) {
                             throw err;
                         }
-                        var userObject = {username: user, password: hash, realname: name};
+                        // Edit userObject to reflect the fields in the HTML form
+                        var userObject = {username: user, password: hash, realname: name, country: country, state: state, city: city};
+                        // Finally, let's insert the userObject in the 'users' collection of the application database
                         collection.insert(userObject, function(err, data){
                             if (err) {
                                 res.send("Server error!");
@@ -143,10 +160,7 @@ module.exports.init = function(key) {
 
     router.post('/check', function (req, res) {
         if (req.user) {
-            res.send({
-                realname: req.user.realname,
-                userID: req.user._id
-            });
+            res.send(req.user);
         } else {
             res.send(false);
         }

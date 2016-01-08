@@ -1,3 +1,6 @@
+#Environment vars
+env.config
+
 # Logs
 logs
 *.log

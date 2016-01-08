@@ -5,81 +5,31 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <base href="/">
-        <title>Your stock: follow stocks in sync with your team</title>
+        <title>Your book: trade books and read more!</title>
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <!-- Animate.css -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css" />
-        <!-- Abril Fatface Google font for the title -->
-        <link href='https://fonts.googleapis.com/css?family=Abril+Fatface' rel='stylesheet' type='text/css'>
+        <!-- Google Font for page title -->
         <style>
-            #title {
-                font-family: 'Abril Fatface';
-            }
-            #subtitle {
-                font-family: serif;
-                color: gray;
-            }
-            .fa-trash {
-                cursor: pointer;
-            }
-            #chart-container {
-                height: 35em;
-            }
-            form {
-                margin-top: 1em;
-                margin-bottom: 2em;
-            }
-            .stock-name-div {
-                display: inline-block;
-                margin-right: 0.8em;
-            }
-            #stock-refresh-div {
-                display: inline-block;
-                cursor: pointer;
-            }
         </style>
     </head>
-    <body ng-app="stockModule" ng-controller="MainController">
-        <div class="container">
-            <h1 id="title" class="text-success text-center">Your stock</h1>
-            <h4 id="subtitle" class="text-center">Follow the stock market in sync with your colleagues</h4>
-            <div class="row">
-                <div id="chart-container"></div>
-            </div>
-            <div class="row">
-                <div class="stock-name-div" ng-repeat="stock in stocksArray">
-                    <h3><span class="label label-default">{{stock.name}} <i class="fa fa-trash text-danger" ng-show="!stock.isLoading" ng-click="removeStock(stock)"></i><i class="fa fa-cog fa-spin text-danger" ng-show="stock.isLoading"></i></span></h3>
-                </div>
-                <div id="stock-refresh-div">
-                    <h3><span class="label label-info" ng-click="refresh()">Refresh <i class="fa fa-refresh" ng-show="!isRefreshing"></i><i class="fa fa-refresh fa-spin" ng-show="isRefreshing"></i></span></h3>
-                </div>
-            </div>
-            <div class="row">
-                <form class="form-inline">
-                    <div class="form-group">
-                        <label class="sr-only" for="stock-input">Name</label>
-                        <input type="text" class="form-control" id="stock-input" placeholder="New stock" ng-model="stockInput">
-                    </div>
-                    <button type="submit" class="btn btn-default" ng-click="addStock(stockInput)">Add stock <i class="fa fa-cog" ng-show="!isLoading"></i><i class="fa fa-cog fa-spin" ng-show="isLoading"></i></button>
-                    <p class="text-danger">{{message}}</p>
-                </form>
-            </div>
-            <div id="footer">
-                <small>
-                    <p>All data provided by Yahoo Finance. This page is a programming exercise for <a href="http://www.freecodecamp.com" target="_blank">freeCodeCamp</a> and should not be used for investment decisions.</p>
-                </small>
-            </div>
+    <body>
+        <div ng-app="bookModule" ng-controller="MainController">
+            <div ng-include="'login-strip.html'"></div>
+            <p ng-show="isLogged">name: {{user.realname}} username: {{user.username}} _id: {{user._id}} country: {{user.country}} state: {{user.state}} city: {{user.city}}</p>
         </div>
         <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <!-- AngularJS -->
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-        <!-- Highcharts library for plotting the stock chart -->
-        <script src="http://code.highcharts.com/stock/highstock.js"></script>
-        <!-- Your Stock AngularJS script -->
-        <script src="script/angular-stock.js"></script>
+        <!-- Countries and their states and provinces file -->
+        <script type= "text/javascript" src = "script/countries.js"></script>
+        <!-- Login AngularJS module -->
+        <script src="script/angular-login.js"></script>
+        <!-- My bar AngularJS script -->
+        <script src="script/angular-book.js"></script>
     </body>
 </html>

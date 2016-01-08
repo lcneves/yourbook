@@ -13,16 +13,17 @@
     });
     
     app.controller('StatusController', ['$scope', 'loginStatus', function($scope, loginStatus) {
+        // This controller uses $emit to send login info to the main app controller, that should be the parent scope.
+        // It also uses $broadcast to send info to the children controllers, such as SettingsController.
         $scope.receivedLogin = false;
         $scope.getLogin = function() {
             loginStatus.getLogin().then(function() {
                 $scope.$emit('received', true)
                 $scope.receivedLogin = true;
                 if (loginStatus.data) {
-                    $scope.$emit('userID', loginStatus.data.userID);
-                    $scope.$emit('user', loginStatus.data.realname);
-                    $scope.userID = loginStatus.data.userID;
-                    $scope.user = loginStatus.data.realname;
+                    $scope.$emit('user', loginStatus.data);
+                    $scope.$broadcast('user', loginStatus.data);
+                    $scope.user = loginStatus.data;
                     $scope.isLogged = true;
                 } else {
                     $scope.$emit('user', false);
@@ -36,12 +37,7 @@
     }]);
     
     app.controller('RegisterController', ['$scope', function($scope) {
-        $scope.user = {
-            username: '',
-            password: '',
-            passwordRepeat: '',
-            realname: ''
-        };
+        
         $scope.message = "";
         $scope.register = function() {
             if (!$scope.isLoading) {
@@ -92,6 +88,32 @@
             if (!$scope.isLoading) {
                 $scope.isLoading = true;
                 jQuery.post("session/logout", function(data) {
+                    $scope.isLoading = false;
+                    $scope.$parent.getLogin();
+                });
+            }
+        };
+    }]);
+    
+    app.controller('SettingsController', ['$scope', function($scope) {
+        // Update form fields upon receiving login information
+        $scope.$on('user', function(event, data){
+            if (data) {
+                $scope.new = {
+                    newPassword: '',
+                    passwordRepeat: '',
+                    realname: $scope.$parent.user.realname,
+                    country: $scope.$parent.user.country,
+                    state: $scope.$parent.user.state,
+                    city: $scope.$parent.user.city,
+                    oldPassword: ''
+                };
+            }
+        });
+        $scope.update = function(newUserData) {
+            if (!$scope.isLoading) {
+                $scope.isLoading = true;
+                jQuery.put("session/update", newUserData, function(data) {
                     $scope.isLoading = false;
                     $scope.$parent.getLogin();
                 });
