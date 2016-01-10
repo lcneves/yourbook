@@ -14,12 +14,84 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css" />
         <!-- Google Font for page title -->
         <style>
+            #add-book-form {
+                max-width: 25em;
+                margin: auto;
+            }
+            .book-result-div {
+                position: relative;
+                min-width: 10em;
+                height: 27em;
+                border-radius: 3px;
+                margin: 1em auto;
+            }
+            .book-cover-img {
+                display: block;
+                text-align: center;
+                height: 20em;
+            }
         </style>
     </head>
     <body>
         <div class="container" ng-app="bookModule" ng-controller="MainController">
-            <div ng-include="'login-strip.html'"></div>
-            <p ng-show="isLogged">name: {{user.realname}} username: {{user.username}} _id: {{user._id}} country: {{user.country}} state: {{user.state}} city: {{user.city}}</p>
+            <div class="row">
+                <div ng-include="'login-strip.html'"></div>
+            </div>
+            <div class="row">
+                <ul class="nav nav-pills">
+                    <li role="presentation" ng-class="{allBooks:'active'}[tab]" ng-click="tab='allBooks'"><a href="#">All books</a></li>
+                    <li role="presentation" ng-class="{myCollection:'active'}[tab]" ng-click="tab='myCollection'"><a href="#">My collection</a></li>
+                    <li role="presentation" ng-class="{myTrades:'active'}[tab]" ng-click="tab='myTrades'"><a href="#">My trades</a></li>
+                </ul>
+            </div>
+            <div ng-show="tab == 'allBooks'">
+                <div class="row">
+                    <h2>All books</h2>
+                </div>
+            </div>
+            <div ng-show="tab == 'myCollection'">
+                <div class="row">
+                    <h2>My collection</h2>
+                </div>
+                <div class="row">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Add book to collection</div>
+                        <div class="panel-body">
+                            <form id="add-book-form" class="form-horizontal" name="add-book-form" ng-submit="addBook(bookQuery)">
+                                <div class="form-group">
+                                    <label for="title" class="control-label sr-only">Title:</label>
+                                    <input id="title" class="form-control" type="text" name="title" ng-model="bookQuery.title" placeholder="Book title"></input>
+                                </div>
+                                <div class="form-group">
+                                    <label for="author" class="control-label sr-only">Author:</label>
+                                    <input id="author" class="form-control" type="text" name="author" ng-model="bookQuery.author" placeholder="Author"/>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-default">Search <i class="fa fa-cog" ng-show="!bookQuery.isLoading"></i><i class="fa fa-cog fa-spin" ng-show="bookQuery.isLoading"></i></button>
+                                </div>
+                                <div>
+                                    <p class="error-message text-danger" ng-show="bookQuery.errorStatus == 'error'">{{bookQuery.errorMessage}}</p>
+                                </div>
+                            </form>
+                            <div class="row" ng-show="bookQuery.errorStatus == 'success'">
+                                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="book in resultsArray">
+                                    <div class="book-result-div">
+                                        <img class="book-cover-img" ng-src="{{book.cover}}">
+                                        <strong>Title:</strong> {{book.title}}<br>
+                                        <strong>Author:</strong> {{book.authors}}<br>
+                                        <button type="button" class="btn btn-success" ng-click="addBook(book)">Add this book</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="tab == 'myTrades'">
+                <div class="row">
+                    <h2>My trades</h2>
+                </div>
+            </div>
         </div>
         <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>

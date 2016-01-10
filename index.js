@@ -6,7 +6,7 @@ var PORT = process.env.PORT || 8080,
     mongoHelper = require('./mongo-helper.js'),
     mySession = require('./session.js'),
     bodyparser = require('body-parser'),
-    http = require('http'),
+    https = require('https'),
     session = require('express-session'),
     express = require('express'),
     app = express();
@@ -33,8 +33,71 @@ app.use('/session', mySession.router);
 app.use(express.static('public'));
 
 // Listen to book query and get JSON at Open Library
-app.post('/search', function (req, res) {
-    
+app.post('/search-book', function (req, res) {
+    var title = typeof(req.body.title) == "string" ? req.body.title.toLowerCase().trim().split(' ').join('+') : false,
+        author = typeof(req.body.author) == "string" ? req.body.author.toLowerCase().trim().split(' ').join('+') : false;
+    // Check if at least one field has been informed
+    if (!title && !author) {
+        return res.send({
+            error: true,
+            message: "Please fill in at least one field"
+        });
+    }
+    // Make https query string to the Open Library search API
+    var queryString = 'https://openlibrary.org/search.json?';
+    if (title) {
+        queryString += 'title=' + title;
+        if (author) { queryString += '&' }
+    }
+    if (author) {
+        queryString += 'author=' + author;
+    }
+    // Call Open Library search API and get the results as JSON
+    var request = https.get(queryString, function(httpResponse) {
+        var body = '';
+        httpResponse.on('data', function(chunk) {
+            body += chunk;
+        }).on('end', function() {
+            var data;
+            try {
+                data = JSON.parse(body);
+            }
+            catch(e) {
+                return res.send({
+                    error: true,
+                    message: "Invalid results. Sorry!"
+                });
+            }
+            var resultsArray = [];
+            if (data.docs && data.docs.length > 0) {
+                // Let's limit results to 12.
+                var limit = data.docs.length < 12 ? data.docs.length : 12;
+                var placeholderCover = (req.secure ? 'https://' : 'http://') + req.headers.host + '/img/cover-placeholder.png';
+                for (var i = 0; i < limit; i++) {
+                    resultsArray.push({
+                        title: data.docs[i].title ? data.docs[i].title : "N/A",
+                        authors: data.docs[i].author_name ? data.docs[i].author_name.join(', ') : "N/A",
+                        cover: data.docs[i].cover_edition_key ? 'http://covers.openlibrary.org/b/olid/' + data.docs[i].cover_edition_key + '-M.jpg' : placeholderCover
+                    });
+                }
+                res.send({
+                    error: false,
+                    data: resultsArray
+                });
+            } else {
+                return res.send({
+                    error: true,
+                    message: "No results found"
+                });
+            }
+        });
+    });
+    request.on('error', function(err) {
+        return res.send({
+            error: true,
+            message: err
+        });
+    });
 });
 
 // Connect to DB and, if successful, start listening to connections
