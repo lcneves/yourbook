@@ -6,6 +6,7 @@ var PORT = process.env.PORT || 8080,
     mongoHelper = require('./mongo-helper.js'),
     mySession = require('./session.js'),
     bodyparser = require('body-parser'),
+    http = require('http'),
     session = require('express-session'),
     express = require('express'),
     app = express();
@@ -30,6 +31,11 @@ app.use('/session', mySession.router);
 
 // Serve static HTML and JS files from the "public" dir.
 app.use(express.static('public'));
+
+// Listen to book query and get JSON at Open Library
+app.post('/search', function (req, res) {
+    
+});
 
 // Connect to DB and, if successful, start listening to connections
 mongoHelper.init(DB_URL, function (error) {

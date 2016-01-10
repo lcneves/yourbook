@@ -21,11 +21,33 @@
     .text-input {
         margin-right: 0.5em;
     }
-    .logout-icon {
-        margin-left: 0.5em;
+    #menu-div {
+        float: right;
+    }
+    #menu-link {
+        text-align: right;
+    }
+    #menu-items-div {
+        
+    }
+    #menu-ul {
+        list-style-type: none;
     }
     .login-strip-link {
         color: #c1d7e9 !important;
+    }
+    .form-title {
+        background-color: lightgray;
+        line-height: 2em;
+        border-radius: 3px;
+    }
+    .close-icon-div {
+        float: right;
+        height: 100%;
+        margin-right: 0.5em;
+    }
+    .close-icon {
+        text-align: center;
     }
 </style>
 <div id="login-body" ng-app="loginModule">
@@ -41,6 +63,7 @@
                     <div id="form-container" class="panel-body form-container">
                         <div id="register-div" class="form-div">
                             <form id="register-form" name="register-form" ng-controller="RegisterController" ng-submit="register()">
+                            <h4 class="form-title"><div class="close-icon-div"><a class="close-icon-link" href="#"><i class="fa fa-times close-icon text-danger"></i></a></div>Register new user</h4>
                                 <div class="form-group">
                                     <label class="sr-only" for="register-username">Username:</label>
                                     <input id="register-username" class="form-control text-input" type="text" name="username" ng-model="user.username" placeholder="User name"/>
@@ -77,6 +100,7 @@
                         </div>
                         <div id="login-div" class="form-div">
                             <form id="login-form" name="login-form" ng-controller="LoginController" ng-submit="login()">
+                            <h4 class="form-title"><div class="close-icon-div"><a class="close-icon-link" href="#"><i class="fa fa-times close-icon text-danger"></i></a></div>User login</h4>
                                 <div class="form-group">
                                     <label class="sr-only" for="login-username">Username:</label>
                                     <input id="login-username" class="form-control text-input" type="text" name="username" ng-model="user.username" placeholder="User name"/>
@@ -96,12 +120,20 @@
             </div>
             <div id="login-logged" ng-show="isLogged">
                 <div class="panel panel-primary">
-                    <div class="panel-heading" ng-controller="LogoutController">
-                        <h4>Welcome, {{user.realname}}! <a id="settings-link" class="logout-icon login-strip-link" href="#"><i class="fa fa-wrench"></i></a> <a class="logout-icon login-strip-link" href="#" ng-click="logout()" ng-show="!isLoading"><i class="fa fa-sign-out"></i></a><i class="fa fa-cog fa-spin logout-icon" ng-show="isLoading"></i></h4>
+                    <div class="panel-heading">
+                        <div id="menu-div" role="presentation" class="dropdown" ng-controller="LogoutController">
+                            <a class="dropdown-toggle login-strip-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" ng-show="!isLoading"><h4><i class="fa fa-bars"></i></h4></a><h4 ng-show="isLoading"><i class="fa fa-cog fa-spin"></i></h4>
+                            <ul class="dropdown-menu pull-right">
+                                <li><a id="settings-link" href="#"><i class="fa fa-wrench"></i> Edit profile</a></li>
+                                <li><a href="#" ng-click="logout()"><i class="fa fa-sign-out"></i> Sign out</a></li>
+                            </ul>
+                        </div>
+                        <h4>Welcome, {{user.realname}}!</h4>
                     </div>
                     <div id="settings-container" class="panel-body form-container">
                         <div id="settings-div" class="form-div">
                             <form id="settings-form" class="form-horizontal" name="settings-form" ng-controller="SettingsController" ng-submit="update(new)">
+                                <h4 class="form-title"><div class="close-icon-div"><a class="close-icon-link" href="#"><i class="fa fa-times close-icon text-danger"></i></a></div>Edit profile</h4>
                                 <div class="form-group">
                                     <label for="settings-password" class="col-sm-5 control-label">New password:</label>
                                     <div class="col-sm-7">
@@ -165,7 +197,7 @@
     (function($) {
         $("#login-link").click(function() {
             if($("#login-div").css('display') == 'none') {
-                $("#form-container").css("height", "12em");
+                $("#form-container").css("height", "15em");
                 $("#register-div").removeClass("animated slideInDown").addClass("animated fadeOutDown");
                 window.setTimeout(function() {
                     $("#register-div").removeClass("animated fadeOutDown").css('display', 'none');
@@ -175,7 +207,7 @@
         });
         $("#register-link").click(function() {
             if($("#register-div").css('display') == 'none') {
-                $("#form-container").css("height", "29em");
+                $("#form-container").css("height", "32.5em");
                 $("#login-div").removeClass("animated slideInDown").addClass("animated fadeOutDown");
                 window.setTimeout(function() {
                     $("#login-div").removeClass("animated fadeOutDown").css('display', 'none');
@@ -185,7 +217,7 @@
         });
         $("#settings-link").click(function() {
             if($("#settings-div").css('display') == 'none') {
-                $("#settings-container").css("height", "29em");
+                $("#settings-container").css("height", "32.5em");
                 window.setTimeout(function() {
                     $("#settings-div").css('display', 'block').addClass("animated slideInDown");
                 }, 700);
@@ -198,6 +230,12 @@
                     $("#settings-div").css("display", "none");
                 }, 1400);
             }
+        });
+        $(".close-icon-link").click(function() {
+            $(".form-container").css("height", "0");
+            window.setTimeout(function() {
+                $(".form-div").css("display", "none");
+            }, 700);
         });
     }(jQuery));
 </script>

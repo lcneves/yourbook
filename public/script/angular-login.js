@@ -70,6 +70,7 @@
             if (!$scope.isLoading) {
                 $scope.isLoading = true;
                 jQuery.post("session/login", $scope.user, function(data) {
+                    $scope.isLoading = false;
                     $scope.user.password = '';
                     if (data.message) {
                         $scope.message = data.message;
@@ -77,7 +78,6 @@
                     } else {
                         $scope.$parent.getLogin();
                     }
-                    $scope.isLoading = false;
                 });
             }
         };

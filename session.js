@@ -11,6 +11,9 @@ var SESSION_KEY,
     session = require('express-session'),
     express = require('express'),
     router = express.Router();
+    
+    // Testing requirements
+var util = require('util');
 
 // Router config: get session key from main app
 
@@ -89,19 +92,19 @@ module.exports.init = function(key) {
             city = req.body.city;
 
         // Some server-side error checking
-        if (user == "") {
+        if (!user || user == "") {
             res.send("Username cannot be empty");
             return;
         }
-        if (pass == "") {
+        if (!pass || pass == "") {
             res.send("Password cannot be empty");
             return;
         }
-        if (passRepeat == "") {
+        if (!passRepeat || passRepeat == "") {
             res.send("Please repeat the password");
             return;
         }
-        if (name == "") {
+        if (!name || name == "") {
             res.send("Please enter your name");
             return;
         }
