@@ -105,48 +105,49 @@
                                 <div class="form-group">
                                     <label for="settings-password" class="col-sm-5 control-label">New password:</label>
                                     <div class="col-sm-7">
-                                        <input id="settings-password" class="form-control text-input" type="password" name="password" ng-model="new.newPassword" placeholder="Unchanged"/>
+                                        <input id="settings-password" class="form-control text-input" type="password" name="password" ng-model="new.newPassword" placeholder="Unchanged"></input>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="settings-password-repeat" class="col-sm-5 control-label">Repeat password:</label>
                                     <div class="col-sm-7">
-                                        <input id="register-password-repeat" class="form-control text-input" type="password" name="password-repeat" ng-model="new.passwordRepeat" placeholder="Unchanged"/>
+                                        <input id="register-password-repeat" class="form-control text-input" type="password" name="password-repeat" ng-model="new.passwordRepeat" placeholder="Unchanged"></input>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="settings-realname" class="col-sm-5 control-label">Real name:</label>
                                     <div class="col-sm-7">
-                                        <input id="settings-realname" class="form-control text-input" type="text" name="realname" ng-model="new.realname"/>
+                                        <input id="settings-realname" class="form-control text-input" type="text" name="realname" ng-model="new.realname" placeholder="Unchanged"></input>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="settings-country" class="col-sm-5 control-label">Country:</label>
                                     <div class="col-sm-7">
-                                        <input id="settings-country" class="form-control text-input" type="text" name="country" ng-model="new.country"></input>
+                                        <input id="settings-country" class="form-control text-input" type="text" name="country" ng-model="new.country" placeholder="Unchanged"></input>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="settings-state" class="col-sm-5 control-label">State:</label>
                                     <div class="col-sm-7">
-                                        <input id="settings-state" class="form-control text-input" type="text" name="state" ng-model="new.state"></input>
+                                        <input id="settings-state" class="form-control text-input" type="text" name="state" ng-model="new.state" placeholder="Unchanged"></input>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="settings-city" class="col-sm-5 control-label">City:</label>
                                     <div class="col-sm-7">
-                                        <input id="settings-city" class="form-control text-input" type="text" name="city" ng-model="new.city" placeholder="City"/>
+                                        <input id="settings-city" class="form-control text-input" type="text" name="city" ng-model="new.city" placeholder="Unchanged"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="settings-old-password" class="col-sm-5 control-label">Old password:</label>
+                                    <label for="settings-current-password" class="col-sm-5 control-label">Current password:</label>
                                     <div class="col-sm-7">
-                                        <input id="settings-old-password" class="form-control text-input" type="password" name="old-password" ng-model="new.oldPassword" required/>
+                                        <input id="settings-current-password" class="form-control text-input" type="password" name="currentPassword" ng-model="new.currentPassword" required/>
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-default">Update <i class="fa fa-cog" ng-show="!isLoading"></i><i class="fa fa-cog fa-spin" ng-show="isLoading"></i></button>
                                 <div>
-                                    <p class="error-message text-danger">{{message}}</p>
+                                    <p class="error-message text-danger" ng-show="errorStatus == 'error'">{{errorMessage}}</p>
+                                    <p class="error-message text-success" ng-show="errorStatus == 'success'">User settings successfully updated!</p>
                                 </div>
                             </form>
                         </div>

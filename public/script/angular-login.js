@@ -102,20 +102,27 @@
                 $scope.new = {
                     newPassword: '',
                     passwordRepeat: '',
-                    realname: $scope.$parent.user.realname,
-                    country: $scope.$parent.user.country,
-                    state: $scope.$parent.user.state,
-                    city: $scope.$parent.user.city,
-                    oldPassword: ''
+                    realname: data.realname,
+                    country: data.country,
+                    state: data.state,
+                    city: data.city,
+                    currentPassword: ''
                 };
             }
         });
         $scope.update = function(newUserData) {
             if (!$scope.isLoading) {
                 $scope.isLoading = true;
-                jQuery.put("session/update", newUserData, function(data) {
+                jQuery.post("session/update", newUserData, function(data) {
                     $scope.isLoading = false;
-                    $scope.$parent.getLogin();
+                    if (data.error) {
+                        $scope.errorStatus = "error";
+                        $scope.errorMessage = data.message;
+                        $scope.$apply();
+                    } else {
+                        $scope.errorStatus = "success";
+                        $scope.$parent.getLogin();
+                    }
                 });
             }
         };

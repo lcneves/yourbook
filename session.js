@@ -170,5 +170,86 @@ module.exports.init = function(key) {
         req.logout();
         res.send('Logout');
     });
+    
+    router.post('/update', function (req, res) {
+        var userID = req.user ? req.user._id : false,
+            pass = req.body.newPassword ? req.body.newPassword : false,
+            passRepeat = req.body.passwordRepeat ? req.body.passwordRepeat : false,
+            currentPass = req.body.currentPassword ? req.body.currentPassword : false;
+            
+        // Edit the following vars to match your HTML form values
+        var name = req.body.realname ? req.body.realname : false,
+            country = req.body.country ? req.body.country : false,
+            state = req.body.state ? req.body.state : false,
+            city = req.body.city ? req.body.city : false;
+
+        // Some server-side error checking
+        if (!userID) {
+            res.send({
+                error: true,
+                message: "Not logged in"
+            });
+            return;
+        }
+        if (!currentPass || currentPass == "") {
+            res.send({
+                error: true,
+                message: "Current password cannot be empty"
+            });
+            return;
+        }
+        if (pass != passRepeat) {
+            res.send({
+                error: true,
+                message: "New passwords do not match"
+            });
+            return;
+        }
+        
+        // Errors checked, let's begin the database work by checking if user exists
+        var collection = dbConfig.db.collection('users');
+        collection.findOne(
+            {_id: objectID(userID)},
+            function(err, user) {
+                if (err) { throw err; }
+                if (user) {
+                    // User found, let's check if the current password matches the provided one
+                    bcrypt.compare(currentPass, user.password, function(err, bcryptRes) {
+                        if (err) { throw err; }
+                        if (bcryptRes) {
+                            // The user has provided the correct password. Let's update their profile!
+                            // Let's deep-copy the old user object retrieved from the DB and update only the fields that have been changed.
+                            var newUserObject = JSON.parse(JSON.stringify(user));
+                            delete newUserObject._id; // We shouldn't touch the _id in the database
+                            if (pass && pass != '') {
+                                var salt = bcrypt.genSaltSync(BCRIPT_COST);
+                                var hash = bcrypt.hashSync(pass, salt); // Note: using the sync version, because blocking is desirable here
+                                newUserObject.password = hash;
+                            }
+                            if (name && name != '') { newUserObject.realname = name; }
+                            if (country && country != '') { newUserObject.country = country; }
+                            if (state && state != '') { newUserObject.state = state; }
+                            if (city && city != '') { newUserObject.city = city; }
+                            collection.update({_id: objectID(userID)}, newUserObject, function(err, data) {
+                                if (err) { throw err;}
+                                res.send({error: false});
+                            });
+                        } else {
+                            return res.send({
+                                error: true,
+                                message: 'Incorrect password.'
+                            });
+                        }
+                    });
+                } else {
+                    // User does not exist. Weird!
+                    res.send({
+                        error: true,
+                        message: "User not found"
+                    });
+                }
+            }
+        );
+    });
 
 };
