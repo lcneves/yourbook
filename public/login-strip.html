@@ -33,6 +33,9 @@
     #menu-ul {
         list-style-type: none;
     }
+    #settings-container {
+        max-height: 32.5em;
+    }
     .login-strip-link {
         color: #c1d7e9 !important;
     }
@@ -48,6 +51,11 @@
     }
     .close-icon {
         text-align: center;
+    }
+    @media (max-width: 767px) {
+        #settings-container {
+            max-height: 45em;
+        }
     }
 </style>
 <div id="login-body" ng-app="loginModule">
@@ -217,18 +225,8 @@
         });
         $("#settings-link").click(function() {
             if($("#settings-div").css('display') == 'none') {
-                $("#settings-container").css("height", "32.5em");
-                window.setTimeout(function() {
-                    $("#settings-div").css('display', 'block').addClass("animated slideInDown");
-                }, 700);
-            } else {
-                $("#settings-div").removeClass("animated slideInDown").addClass("animated fadeOutDown");
-                window.setTimeout(function() {
-                    $("#settings-container").css("height", "0");
-                }, 700);
-                window.setTimeout(function() {
-                    $("#settings-div").css("display", "none");
-                }, 1400);
+                $("#settings-container").css("height", "45em");
+                $("#settings-div").css('display', 'block').addClass("animated slideInDown");
             }
         });
         $(".close-icon-link").click(function() {
