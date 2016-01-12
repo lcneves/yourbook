@@ -47,17 +47,42 @@
             <div ng-show="tab == 'allBooks'">
                 <div class="row">
                     <h2>All books</h2>
+                    <div ng-show="allBooks.status == 'success'">
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="book in allBooks.books">
+                            <div class="book-result-div">
+                                <img class="book-cover-img" ng-src="{{book.cover}}">
+                                <strong>Title:</strong> {{book.title}}<br>
+                                <strong>Author:</strong> {{book.authors}}<br>
+                                <button type="button" class="btn btn-primary" ng-click="trade(book)">Propose a trade!</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="error-message text-danger" ng-show="allBooks.status == 'error'">{{myCollection.message}}</p>
                 </div>
             </div>
             <div ng-show="tab == 'myCollection'">
                 <div class="row">
                     <h2>My collection</h2>
+                    <div ng-show="!isLogged">
+                        <p>Please log in to see your collection.</p>
+                    </div>
+                    <div ng-show="isLogged && myCollection.status == 'success'">
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="book in myCollection.books">
+                            <div class="book-result-div">
+                                <img class="book-cover-img" ng-src="{{book.cover}}">
+                                <strong>Title:</strong> {{book.title}}<br>
+                                <strong>Author:</strong> {{book.authors}}<br>
+                                <button type="button" class="btn btn-danger" ng-click="removeBook(book)">Remove this book</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="error-message text-danger" ng-show="myCollection.status == 'error'">{{myCollection.message}}</p>
                 </div>
                 <div class="row">
                     <div class="panel panel-primary">
                         <div class="panel-heading">Add book to collection</div>
                         <div class="panel-body">
-                            <form id="add-book-form" class="form-horizontal" name="add-book-form" ng-submit="addBook(bookQuery)">
+                            <form id="add-book-form" class="form-horizontal" name="add-book-form" ng-submit="searchBook(bookQuery)">
                                 <div class="form-group">
                                     <label for="title" class="control-label sr-only">Title:</label>
                                     <input id="title" class="form-control" type="text" name="title" ng-model="bookQuery.title" placeholder="Book title"></input>
@@ -67,13 +92,13 @@
                                     <input id="author" class="form-control" type="text" name="author" ng-model="bookQuery.author" placeholder="Author"/>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-default">Search <i class="fa fa-cog" ng-show="!bookQuery.isLoading"></i><i class="fa fa-cog fa-spin" ng-show="bookQuery.isLoading"></i></button>
+                                    <button type="submit" class="btn btn-default">Search <i class="fa fa-cog" ng-show="query.status != 'loading'"></i><i class="fa fa-cog fa-spin" ng-show="query.status == 'loading'"></i></button>
                                 </div>
                                 <div>
-                                    <p class="error-message text-danger" ng-show="bookQuery.errorStatus == 'error'">{{bookQuery.errorMessage}}</p>
+                                    <p class="error-message text-danger" ng-show="query.status == 'error'">{{query.message}}</p>
                                 </div>
                             </form>
-                            <div class="row" ng-show="bookQuery.errorStatus == 'success'">
+                            <div class="row" ng-show="query.status == 'success'">
                                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="book in resultsArray">
                                     <div class="book-result-div">
                                         <img class="book-cover-img" ng-src="{{book.cover}}">

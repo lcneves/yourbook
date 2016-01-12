@@ -4,6 +4,8 @@ var PORT = process.env.PORT || 8080,
     SESSION_KEY = process.env.SESSION_KEY,
     DB_URL = process.env.DB_URL,
     mongoHelper = require('./mongo-helper.js'),
+    collection,
+    objectID=require('mongodb').ObjectID,
     mySession = require('./session.js'),
     bodyparser = require('body-parser'),
     https = require('https'),
@@ -31,6 +33,47 @@ app.use('/session', mySession.router);
 
 // Serve static HTML and JS files from the "public" dir.
 app.use(express.static('public'));
+
+// List all books in all users' collections
+app.post('/list-all-books', function (req, res) {
+    collection.find({}).toArray(function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        res.send({
+            error: false,
+            data: data
+        });
+    });
+});
+
+// List books of user's personal collection
+app.post('/list-personal-collection', function (req, res) {
+    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    if (!userID) {
+        return res.send({
+            error: true,
+            message: "Not logged in"
+        });
+    }
+    collection.find({ owner: userID }).toArray(function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        res.send({
+            error: false,
+            data: data
+        });
+    });
+});
 
 // Listen to book query and get JSON at Open Library
 app.post('/search-book', function (req, res) {
@@ -100,8 +143,68 @@ app.post('/search-book', function (req, res) {
     });
 });
 
+// Function to add a book to user's collection
+app.post('/add-book', function (req, res) {
+    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    if (!userID) {
+        return res.send({
+            error: true,
+            message: "Not logged in"
+        });
+    }
+    var bookObject = JSON.parse(JSON.stringify(req.body));
+    delete bookObject['$$hashKey'];
+    bookObject.owner = userID;
+    collection.insert(bookObject, function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        res.send({
+            error: false,
+            message: "Book added to collection"
+        });
+    });
+});
+
+// Function to undo the above
+app.post('/remove-book', function (req, res) {
+    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    if (!userID) {
+        return res.send({
+            error: true,
+            message: "Not logged in"
+        });
+    }
+    var bookObject = JSON.parse(JSON.stringify(req.body));
+    if (userID != bookObject.owner) {
+        return res.send({
+            error: true,
+            message: "User does not own the book"
+        });
+    }
+    var bookID = objectID(bookObject._id);
+    collection.remove({ _id: bookID }, { justOne: true }, function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        res.send({
+            error: false,
+            message: "Book removed from collection"
+        });
+    });
+});
+
 // Connect to DB and, if successful, start listening to connections
 mongoHelper.init(DB_URL, function (error) {
+    collection = mongoHelper.db.collection('libraries');
     if (error) { throw error; }
     console.log('Start listening on port ' + PORT);
     app.listen(PORT);
