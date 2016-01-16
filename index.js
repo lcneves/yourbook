@@ -4,7 +4,8 @@ var PORT = process.env.PORT || 8080,
     SESSION_KEY = process.env.SESSION_KEY,
     DB_URL = process.env.DB_URL,
     mongoHelper = require('./mongo-helper.js'),
-    collection,
+    librariesCollection,
+    tradesCollection,
     objectID=require('mongodb').ObjectID,
     mySession = require('./session.js'),
     bodyparser = require('body-parser'),
@@ -36,7 +37,7 @@ app.use(express.static('public'));
 
 // List all books in all users' collections
 app.post('/list-all-books', function (req, res) {
-    collection.find({}).toArray(function(err, data) {
+    librariesCollection.find({}).toArray(function(err, data) {
         if (err) {
             res.send({
                 error: true,
@@ -60,7 +61,7 @@ app.post('/list-personal-collection', function (req, res) {
             message: "Not logged in"
         });
     }
-    collection.find({ owner: userID }).toArray(function(err, data) {
+    librariesCollection.find({ owner: userID }).toArray(function(err, data) {
         if (err) {
             res.send({
                 error: true,
@@ -155,7 +156,7 @@ app.post('/add-book', function (req, res) {
     var bookObject = JSON.parse(JSON.stringify(req.body));
     delete bookObject['$$hashKey'];
     bookObject.owner = userID;
-    collection.insert(bookObject, function(err, data) {
+    librariesCollection.insert(bookObject, function(err, data) {
         if (err) {
             res.send({
                 error: true,
@@ -187,7 +188,7 @@ app.post('/remove-book', function (req, res) {
         });
     }
     var bookID = objectID(bookObject._id);
-    collection.remove({ _id: bookID }, { justOne: true }, function(err, data) {
+    librariesCollection.remove({ _id: bookID }, { justOne: true }, function(err, data) {
         if (err) {
             res.send({
                 error: true,
@@ -202,9 +203,99 @@ app.post('/remove-book', function (req, res) {
     });
 });
 
+app.post('/list-trades', function(req, res) {
+    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    if (!userID) {
+        return res.send({
+            error: true,
+            message: "Not logged in"
+        });
+    }
+    // Parallel DB find functions to return two arrays: the proposals made by the user and the ones received by them
+    var results = {
+        sentProposals: false,
+        receivedProposals: false
+    };
+    var sendResults = function() {
+        res.send({
+            error: false,
+            data: results
+        });
+    };
+    tradesCollection.find({ "myBook.owner": userID }).toArray(function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        results.sentProposals = data;
+        if (results.receivedProposals) { sendResults(); }
+    });
+    tradesCollection.find({ "desiredBook.owner": userID }).toArray(function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        results.receivedProposals = data;
+        if (results.sentProposals) { sendResults(); }
+    });
+});
+
+app.post('/propose-trade', function (req, res) {
+    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    if (!userID) {
+        return res.send({
+            error: true,
+            message: "Not logged in"
+        });
+    }
+    var data = JSON.parse(req.body.data);
+    var myBookObject = data.myBook;
+    if (userID != myBookObject.owner) {
+        return res.send({
+            error: true,
+            message: "User does not own the book"
+        });
+    }
+    var desiredBookObject = data.desiredBook;
+    if (myBookObject && desiredBookObject) {
+        delete myBookObject['$$hashKey'];
+        delete desiredBookObject['$$hashKey'];
+        var insertObject = {
+            myBook: myBookObject,
+            desiredBook: desiredBookObject,
+            status: "proposed"
+        };
+        tradesCollection.insert(insertObject, function(err, data) {
+            if (err) {
+                res.send({
+                    error: true,
+                    message: "Database error, sorry!"
+                });
+                return console.log(err);
+            }
+            res.send({
+                error: false,
+                message: "Trade successfully registered!"
+            });
+        });
+    } else {
+        return res.send({
+            error: true,
+            message: "Books have not been specified." // Have you tampered with the script?
+        });
+    }
+});
+
 // Connect to DB and, if successful, start listening to connections
 mongoHelper.init(DB_URL, function (error) {
-    collection = mongoHelper.db.collection('libraries');
+    librariesCollection = mongoHelper.db.collection('libraries');
+    tradesCollection = mongoHelper.db.collection('trades');
     if (error) { throw error; }
     console.log('Start listening on port ' + PORT);
     app.listen(PORT);

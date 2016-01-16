@@ -11,8 +11,9 @@
             if (data) {
                 $scope.isLogged = true;
                 $scope.user = data;
-                // Get user's personal book collection
+                // Get user's personal book collection and trades
                 $scope.listMyCollection();
+                $scope.listMyTrades();
             } else {
                 $scope.isLogged = false;
                 $scope.user = '';
@@ -21,6 +22,8 @@
         
         // Begin YourBook controller logic
         
+        var desiredBook;
+        
         // Controls the navigation tabs behaviour
         $scope.tab = "allBooks";
         
@@ -28,10 +31,9 @@
         // Function to display all books in all users' collections
         $scope.allBooks = {};
         $scope.listAllBooks = function() {
-            if (!$scope.allBooks.status != "loading") {
+            if ($scope.allBooks.status != "loading") {
                 $scope.allBooks.status = "loading";
                 jQuery.post("list-all-books", function(data) {
-                    console.log(JSON.stringify(data));
                     if (data.error) {
                         $scope.allBooks.status = "error";
                         $scope.allBooks.message = data.message;
@@ -47,16 +49,34 @@
         // Function to display books in personal collection
         $scope.myCollection = {};
         $scope.listMyCollection = function() {
-            if (!$scope.myCollection.status != "loading") {
+            if ($scope.myCollection.status != "loading") {
                 $scope.myCollection.status = "loading";
                 jQuery.post("list-personal-collection", function(data) {
-                    console.log(JSON.stringify(data));
                     if (data.error) {
                         $scope.myCollection.status = "error";
                         $scope.myCollection.message = data.message;
                     } else {
                         $scope.myCollection.status = "success";
                         $scope.myCollection.books = data.data;
+                    }
+                    $scope.$apply();
+                });
+            }
+        };
+        
+        // Function to list all trades that user has proposed or received
+        $scope.trades = {};
+        $scope.listMyTrades = function() {
+            if ($scope.trades.status != "loading") {
+                $scope.trades.status = "loading";
+                jQuery.post("list-trades", function(data) {
+                    console.log("Received response for trades: " + JSON.stringify(data));
+                    if (data.error) {
+                        $scope.trades.status = "error";
+                        $scope.trades.message = data.message;
+                    } else {
+                        $scope.trades.status = "success";
+                        $scope.trades.results = data.data;
                     }
                     $scope.$apply();
                 });
@@ -107,6 +127,37 @@
                 }
             });
         };
+        
+        $scope.tradeModal = {};
+        // Open trade modal, so user can choose book to trade for the desired one
+        $scope.openTradeModal = function(book) {
+            desiredBook = book;
+            $scope.tradeModal.status = "show";
+            (function($) {
+                $('#tradeModal').modal('show');
+            }(jQuery));
+        };
+        
+        // Closes trade modal and registers the trade in the database
+        $scope.trade = function(myBook) {
+            $scope.tradeModal.status = "loading";
+            var sendJSON = JSON.stringify({
+                myBook: myBook,
+                desiredBook: desiredBook
+            });
+            (function($) {
+                $.post("propose-trade", {data: sendJSON}, function(data) {
+                    if (data.error) {
+                        $scope.tradeModal.status = "error";
+                    } else {
+                        $scope.tradeModal.status = "success";
+                    }
+                    $scope.tradeModal.message = data.message;
+                    $scope.$apply();
+                });
+            }(jQuery));
+        };
+        
         // Initialization
         $scope.listAllBooks();
     }]);

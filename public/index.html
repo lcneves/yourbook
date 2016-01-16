@@ -45,6 +45,32 @@
                 </ul>
             </div>
             <div ng-show="tab == 'allBooks'">
+                <div class="modal fade" id="tradeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Trade for...</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row" ng-show="tradeModal.status == 'show'">
+                                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" ng-repeat="myBook in myCollection.books">
+                                        <div class="book-result-div">
+                                            <img class="book-cover-img" ng-src="{{myBook.cover}}">
+                                            <strong>Title:</strong> {{myBook.title}}<br>
+                                            <strong>Author:</strong> {{myBook.authors}}<br>
+                                            <button type="button" class="btn btn-primary" ng-click="trade(myBook)">Give this book</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3 class="text-center" ng-show="tradeModal.status == 'loading'">Loading...</h3>                                
+                                <h3 class="text-center text-danger" ng-show="tradeModal.status == 'error'">{{tradeModal.message}}</h3>
+                                <h3 class="text-center text-success" ng-show="tradeModal.status == 'success'">{{tradeModal.message}}</h3>
+                                <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal" ng-show="tradeModal.status == 'error' || tradeModal.status == 'success'">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <h2>All books</h2>
                     <div ng-show="allBooks.status == 'success'">
@@ -53,7 +79,9 @@
                                 <img class="book-cover-img" ng-src="{{book.cover}}">
                                 <strong>Title:</strong> {{book.title}}<br>
                                 <strong>Author:</strong> {{book.authors}}<br>
-                                <button type="button" class="btn btn-primary" ng-click="trade(book)">Propose a trade!</button>
+                                <button type="button" class="btn btn-primary" ng-show="isLogged && book.owner != user._id" ng-click="openTradeModal(book)">Propose a trade!</button>
+                                <button type="button" class="btn btn-primary" ng-show="isLogged && book.owner == user._id" disabled="disabled">Owned by you</button>
+                                <button type="button" class="btn btn-primary" ng-show="!isLogged" disabled="disabled">Log in to trade</button>
                             </div>
                         </div>
                     </div>
@@ -63,17 +91,17 @@
             <div ng-show="tab == 'myCollection'">
                 <div class="row">
                     <h2>My collection</h2>
-                    <div ng-show="!isLogged">
-                        <p>Please log in to see your collection.</p>
-                    </div>
-                    <div ng-show="isLogged && myCollection.status == 'success'">
-                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="book in myCollection.books">
-                            <div class="book-result-div">
-                                <img class="book-cover-img" ng-src="{{book.cover}}">
-                                <strong>Title:</strong> {{book.title}}<br>
-                                <strong>Author:</strong> {{book.authors}}<br>
-                                <button type="button" class="btn btn-danger" ng-click="removeBook(book)">Remove this book</button>
-                            </div>
+                </div>
+                <div class="row" ng-show="!isLogged">
+                    <p>Please log in to see your collection.</p>
+                </div>
+                <div class="row" ng-show="isLogged && myCollection.status == 'success'">
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="book in myCollection.books">
+                        <div class="book-result-div">
+                            <img class="book-cover-img" ng-src="{{book.cover}}">
+                            <strong>Title:</strong> {{book.title}}<br>
+                            <strong>Author:</strong> {{book.authors}}<br>
+                            <button type="button" class="btn btn-danger" ng-click="removeBook(book)">Remove this book</button>
                         </div>
                     </div>
                     <p class="error-message text-danger" ng-show="myCollection.status == 'error'">{{myCollection.message}}</p>
@@ -115,6 +143,10 @@
             <div ng-show="tab == 'myTrades'">
                 <div class="row">
                     <h2>My trades</h2>
+                </div>
+                <div class="row">
+                    <p ng-show="!isLogged">Please log in to see your trades.</p>
+                    <p class="text-danger" ng-show="isLogged && trades.status == 'error'">{{trades.message}}</p>
                 </div>
             </div>
         </div>
