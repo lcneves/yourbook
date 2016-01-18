@@ -70,7 +70,6 @@
             if ($scope.trades.status != "loading") {
                 $scope.trades.status = "loading";
                 jQuery.post("list-trades", function(data) {
-                    console.log("Received response for trades: " + JSON.stringify(data));
                     if (data.error) {
                         $scope.trades.status = "error";
                         $scope.trades.message = data.message;
@@ -153,9 +152,38 @@
                         $scope.tradeModal.status = "success";
                     }
                     $scope.tradeModal.message = data.message;
-                    $scope.$apply();
+                    $scope.listMyTrades();
                 });
             }(jQuery));
+        };
+        
+        // Function to delete a trade that the user has initiated
+        $scope.removeTrade = function(trade) {
+            jQuery.post("remove-trade", trade, function(data) {
+                if (data.error) {
+                    $scope.trades.status = "error";
+                    $scope.trades.message = data.message;
+                    $scope.$apply();
+                } else {
+                    $scope.listMyTrades();
+                }
+            });
+        };
+        
+        // Function to refuse or accept a trade
+        $scope.answerTrade = function(trade, answer) {
+            jQuery.post("answer-trade", {
+                trade: trade,
+                answer: answer
+            }, function(data) {
+                if (data.error) {
+                    $scope.trades.status = "error";
+                    $scope.trades.message = data.message;
+                    $scope.$apply();
+                } else {
+                    $scope.listMyTrades();
+                }
+            });
         };
         
         // Initialization

@@ -204,7 +204,7 @@ app.post('/remove-book', function (req, res) {
 });
 
 app.post('/list-trades', function(req, res) {
-    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    var userID = req.session.passport ? req.session.passport.user : false;
     if (!userID) {
         return res.send({
             error: true,
@@ -222,7 +222,9 @@ app.post('/list-trades', function(req, res) {
             data: results
         });
     };
-    tradesCollection.find({ "myBook.owner": userID }).toArray(function(err, data) {
+    tradesCollection.find({
+        "myBook.owner": userID
+    }).toArray(function(err, data) {
         if (err) {
             res.send({
                 error: true,
@@ -233,7 +235,9 @@ app.post('/list-trades', function(req, res) {
         results.sentProposals = data;
         if (results.receivedProposals) { sendResults(); }
     });
-    tradesCollection.find({ "desiredBook.owner": userID }).toArray(function(err, data) {
+    tradesCollection.find({
+        "desiredBook.owner": userID
+    }).toArray(function(err, data) {
         if (err) {
             res.send({
                 error: true,
@@ -290,6 +294,72 @@ app.post('/propose-trade', function (req, res) {
             message: "Books have not been specified." // Have you tampered with the script?
         });
     }
+});
+
+// Function to undo the above
+app.post('/remove-trade', function (req, res) {
+    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    if (!userID) {
+        return res.send({
+            error: true,
+            message: "Not logged in"
+        });
+    }
+    var tradeObject = JSON.parse(JSON.stringify(req.body));
+    if (userID != tradeObject["myBook[owner]"]) {
+        return res.send({
+            error: true,
+            message: "User does not own the book"
+        });
+    }
+    var tradeID = objectID(tradeObject._id);
+    tradesCollection.remove({ _id: tradeID }, { justOne: true }, function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        res.send({
+            error: false,
+            message: "Trade removed from collection"
+        });
+    });
+});
+
+// Function to handle answers to trade proposals
+app.post('/answer-trade', function (req, res) {
+    var userID = req.session.passport ? req.session.passport.user : false;
+    if (!userID) {
+        return res.send({
+            error: true,
+            message: "Not logged in"
+        });
+    }
+    if (userID != req.body["trade[desiredBook][owner]"]) {
+        return res.send({
+            error: true,
+            message: "User does not own the book"
+        });
+    }
+    var tradeID = objectID(req.body["trade[_id]"]);
+    var tradeStatus = req.body.answer == 'accept' ? "accepted" : "refused";
+    tradesCollection.update({ _id: tradeID }, { $set: {
+        status: tradeStatus
+    }}, function(err, data) {
+        if (err) {
+            res.send({
+                error: true,
+                message: "Database error, sorry!"
+            });
+            return console.log(err);
+        }
+        res.send({
+            error: false,
+            message: "Trade status updated to " + tradeStatus
+        });
+    });
 });
 
 // Connect to DB and, if successful, start listening to connections
