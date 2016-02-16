@@ -15,6 +15,9 @@
         <!-- "Cardo" Google Font for page title -->
         <link href='https://fonts.googleapis.com/css?family=Cardo' rel='stylesheet' type='text/css'>
         <style>
+            body {
+              min-height: 60em;
+            }
             #page-header {
                 position: relative;
                 font-family: 'Cardo', serif;
@@ -79,7 +82,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h3 class="text-center" ng-show="tradeModal.status == 'loading'">Loading...</h3>                                
+                                <h3 class="text-center" ng-show="tradeModal.status == 'loading'">Loading...</h3>
                                 <h3 class="text-center text-danger" ng-show="tradeModal.status == 'error'">{{tradeModal.message}}</h3>
                                 <h3 class="text-center text-success" ng-show="tradeModal.status == 'success'">{{tradeModal.message}}</h3>
                                 <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal" ng-show="tradeModal.status == 'error' || tradeModal.status == 'success'">Close</button>
